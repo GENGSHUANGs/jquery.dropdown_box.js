@@ -15,7 +15,7 @@
 
 	DropdownBox.prototype.attach = function() {
 		var $dropdown = this.$dropdown = $(this.options.template);
-		this.$dom.attr('__dropdown-old-display', this.$dom.css('display') || '').css('display', '');
+		this.$dom.attr('__dropdown-old-display', this.$dom.css('display') || '').css('display', 'none');
 		this.$dom.after($dropdown);
 		var self = this;
 		$dropdown.on('click', '.dropdown-current', function() {

@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+
+<head>
+        <meta charset="utf-8">
+</head>
+
+<body>
+	<style>
+        body{font-family:'微软雅黑';margin:0px;padding:0px;}
+
+	.dropdown{display:inline-block;position:relative;border:1px solid #cccccc;}
+	.dropdown .dropdown-current{display:block;width:100%;height:100%;text-decoration: none;}
+	.dropdown .dropdown-items{list-style:none;margin:0px;padding:0px;display:none;position:absolute;top:100%;}
+	.dropdown.actived .dropdown-items{display:block;}
+	.dropdown .dropdown-items .dropdown-item {display:block;border-bottom:1px solid #eeeeee;}
+	.dropdown .dropdown-items .dropdown-item:last-child{border-bottom:0px;}
+	.dropdown .dropdown-items .dropdown-item.actived{}
+	.dropdown .dropdown-items .dropdown-item a{text-decoration: none;display:block;width:100%;height:100%;}
+	</style>
+        <div class="vcontrol-switcher" >
+        <select id="select" style="width:120px;height:36px;">
+                <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
+                <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
+                <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
+                <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
+                <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
+                <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
+        </select>
+        </div>
+
+        <br /><br /><br /><br /><br /><br />
+        <div>
+<pre style="width:100%;padding:10px;background:#eeeeee;font-family:'Consolas';font-size:12px;box-sizing:border-box;">
+$('#select').on('change',function(){
+console.log('current value is : ',$(this).val());
+})
+</pre>
+                <button type="button" onclick="$('#select').data('dropdownBox').expand();">展开</button>
+                <button type="button" onclick="$('#select').data('dropdownBox').collapse();">收起</button>
+                <button type="button" onclick="$('#select').data('dropdownBox').switchTo('6');">切换到6</button>
+                <button type="button" onclick="$('#select').data('dropdownBox').switchTo('1');">切换到1</button>
+                <button type="button" onclick="switch_to_2_and_keep();">切换到2并保持展开状态</button>
+                <br />
+                <button type="button" onclick="sort_select()" >排序</button>
+                <button type="button" onclick="rebuild()" >修改(置空)</button>
+                <button type="button" onclick="remove_first()" >删除第一个选项</button>
+                <textarea id="log" style="width:100%;height:300px;font-family:'Consolas';font-size:12px;box-sizing:border-box;"></textarea>
+        </div>
+        <script>
+        console.log = function(){
+                var textarea = document.getElementById('log');
+                var str = '';
+                [].slice.call(arguments).forEach(function(obj){
+                        str += ',' + JSON.stringify(obj);
+                });
+                textarea.value = str + '\r\n' + textarea.value;
+        };
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.0/TweenMax.min.js" ></script>
+        <script src="jquery.min.js"></script>
+        <script src="jquery.dropdown_box.js"></script>
+        <style>
+        .vcontrol-switcher .dropdown{box-sizing:border-box;width:118px;height:36px;line-height:34px;border:1px solid #ffffff;border-radius:0px;transition:all 0.2s linear 0.1s;}
+        .vcontrol-switcher .dropdown:hover,.vcontrol-switcher .dropdown.actived{border-color:#999999;}
+        .vcontrol-switcher .dropdown.actived{border-radius: 0px 0px 0px 0px;}
+        .vcontrol-switcher .dropdown .dropdown-current{color:#111111;text-decoration: none;position:relatve;width:118px;height:36px;}
+        .vcontrol-switcher .dropdown .dropdown-current .text{width: 90px;height: 34px;line-height:34px;display: block;text-align: center;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;box-sizing:border-box;padding-left:5px;padding-right:5px;}
+        .vcontrol-switcher .dropdown .dropdown-current .icon{position: absolute;top: 5px;right: 8px;width: 16px;height: 16px;color: #999999;font-size: 18px;}
+        .vcontrol-switcher .dropdown .dropdown-items{width:118px;border:1px solid #999999;box-sizing:border-box;margin-left:-1px;border-radius:0px 0px 0px 0px;background:#F8F8F8;border-top:1px solid #cccccc;}
+        .vcontrol-switcher .dropdown.actived .dropdown-items{}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-item{}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-item:last-child{border-radius:0px 0px 0px 0px;}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-item.actived{background:#E5E5E5;}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-item a{font-size:12px;color:#111111;width:118px; height:36px;line-height:34px;box-sizing:border-box;padding-left:5px;padding-right:5px;}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-item a .avatar{width:26px;height:26px;margin:0px;padding:0px;border-radius:50%;position: relative;top: -5px;}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-item a .text{height: 36px;line-height: 34px;display: inline-block;position: relative;padding-left: 5px;text-align: left;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;width:77px;color:#111111;}
+        </style>
+        <script>
+        $('#select').dropdownBox({
+                build_current: function(option) {
+                        return '<a class="dropdown-current" href="javascript:;" title="'+(option.innerHTML || '')+'"><span class="text">' + (option.innerHTML || '') + '</span><i class="icon fa fa-sort-desc" ></i></a>';
+                },
+                build: function(option, iselected) {
+                        return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '" title="'+(option.innerHTML || '')+'"><a href="javascript:;"><img class="avatar" src="'+option.getAttribute('data-imgpath')+'" /><span class="text" >' + (option.innerHTML || '') + '</span></a></li>';
+                },
+                expand:function(dropdown){
+                        if($(dropdown).is('.actived'))
+                                return ;
+                        $(dropdown).addClass('actived');
+                        new TimelineMax().fromTo($(dropdown).find('.dropdown-items'),0.2,{
+                                marginTop:'-10px',
+                                opacity:0
+                        },{
+                                marginTop:'0px',
+                                opacity:1
+                        });
+                },
+                collapse:function(dropdown){
+                        if(!$(dropdown).is('.actived'))
+                                return ;
+                        new TimelineMax().fromTo(dropdown.querySelector('.dropdown-items'),0.2,{
+                                marginTop:'0px',
+                                opacity:1
+                        },{
+                                marginTop:'-10px',
+                                opacity:0
+                        }).add(function(){
+                                $(dropdown).removeClass('actived');
+                        });
+                }
+        }).on('change',function(){
+        	console.log('current value is : ',$(this).val());
+        });
+
+
+        function sort_select(){
+                var box = $('#select').data('dropdownBox');
+                box.expand();
+                setTimeout(function(){
+                        box.sort(function(a,b){
+                                console.log('a ,b',a,b);
+                                return -(parseInt(a.value) - parseInt(b.value));
+                        });
+                },500);
+        };
+
+        function switch_to_2_and_keep(){
+                var box = $('#select').data('dropdownBox');
+                box.expand();
+                setTimeout(function(){
+                        box.switchTo('2',true);
+                },1000);
+        };
+
+        function rebuild(){
+                var box = $('#select').data('dropdownBox');
+                box.expand();
+                setTimeout(function(){
+                        $('#select').empty();
+                        box.rebuild();
+                },1000);
+        }
+
+        function remove_first(){
+                var box = $('#select').data('dropdownBox');
+                box.expand();
+                setTimeout(function(){
+                        box.remove('option:first-child');
+                },1000);
+        }
+        </script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+</body>
+
+</html>

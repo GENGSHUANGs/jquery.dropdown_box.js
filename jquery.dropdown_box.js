@@ -66,8 +66,24 @@
 	['expand', 'collapse'].forEach(function(method) {
 		DropdownBox.prototype[method] = function(method) {
 			return function(dropdown) {
+				var delay;
+				if (Object.prototype.toString.call(dropdown) === '[object Number]') {
+					delay = dropdown;
+					dropdown = undefined;
+				}
 				dropdown = dropdown || this.$dropdown[0];
-				this.options[method].call(this.options[method], dropdown);
+				if (typeof this.__delay_timer !== 'undefined')
+					window.clearTimeout(this.__delay_timer);
+				var self = this;
+				var next = function() {
+					self.options[method].call(self.options[method], dropdown, delay);
+					window.clearTimeout(self.__delay_timer);
+					self.__delay_timer = undefined;
+				};
+				if (typeof delay === 'undefined')
+					next();
+				else
+					this.__delay_timer = window.setTimeout(next, delay);
 			};
 		}(method);
 	});

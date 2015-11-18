@@ -38,6 +38,7 @@ console.log('current value is : ',$(this).val());
 </pre>
                 <button type="button" onclick="$('#select').data('dropdownBox').expand();">展开</button>
                 <button type="button" onclick="$('#select').data('dropdownBox').collapse();">收起</button>
+                <button type="button" onclick="$('#select').data('dropdownBox').collapse(1000);">收起(延迟1s)</button>
                 <button type="button" onclick="$('#select').data('dropdownBox').switchTo('6');">切换到6</button>
                 <button type="button" onclick="$('#select').data('dropdownBox').switchTo('1');">切换到1</button>
                 <button type="button" onclick="switch_to_2_and_keep();">切换到2并保持展开状态</button>

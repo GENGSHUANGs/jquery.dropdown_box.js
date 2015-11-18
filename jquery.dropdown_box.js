@@ -88,7 +88,9 @@
 				var self = this;
 				if (method === 'expand' && this.options.mutexWith !== false) {
 					$(this.options.mutexWith).each(function() {
-						console.log(this.id);
+						console.log('is same : ',self.$dom.is(this));
+						if(self.$dom.is(this))
+							return ;
 						var box = $(this).data('dropdownBox');
 						if (typeof box === 'undefined' || box === null)
 							return;
@@ -202,4 +204,4 @@
 	};
 
 	$.fn.dropdownBox.constructor = DropdownBox;
-})(window, jQuery);
+})(window, window.jQuery || window.Zepto);

@@ -1,16 +1,12 @@
 (function(window, $, undefined) {
 	'use strict';
 
-	var DropdownBox = function(dom, options) {
+	var DropdownBox = function(dom, options, autoattach) {
 		this.$dom = $(dom);
 		this.options = $.extend({}, DropdownBox.defaults, options);
+		if (!autoattach)
+			return;
 		this.attach();
-		this.bind_events();
-		window.setTimeout(this.$dom.trigger.bind(this.$dom, 'change'), 0);
-	};
-
-	DropdownBox.prototype.bind_events = function() {
-		this.$dom.on('change', this.rebuild.bind(this));
 	};
 
 	DropdownBox.prototype.attach = function() {
@@ -28,11 +24,15 @@
 		$dropdown.on('click', '.dropdown-items > .dropdown-item > a', function() {
 			self.switchTo($(this).closest('.dropdown-item').attr('data-value'));
 		});
+
+		this.$dom.on('change', this.rebuild.bind(this));
+		window.setTimeout(this.$dom.trigger.bind(this.$dom, 'change'), 0);
 	};
 
 	DropdownBox.prototype.detach = function() {
 		this.$dom.css('display', this.$dom.attr('__dropdown-old-display'));
-		$dropdown.remove();
+		this.$dom.off('change', this.rebuild.bind(this));
+		this.$dropdown.remove();
 	};
 
 	DropdownBox.prototype.build = DropdownBox.prototype.rebuild = function() {
@@ -88,9 +88,8 @@
 				var self = this;
 				if (method === 'expand' && this.options.mutexWith !== false) {
 					$(this.options.mutexWith).each(function() {
-						console.log('is same : ',self.$dom.is(this));
-						if(self.$dom.is(this))
-							return ;
+						if (self.$dom.is(this))
+							return;
 						var box = $(this).data('dropdownBox');
 						if (typeof box === 'undefined' || box === null)
 							return;
@@ -194,12 +193,17 @@
 	// 获取操控对象
 	$('select').data('dropdownBox').xxx();
 	```*/
-	$.fn.dropdownBox = function(options, dataKey) {
+	$.fn.dropdownBox = function(options, dataKey, autoattach) {
+		if (Object.prototype.toString.call(dataKey) === '[object Boolean]') {
+			autoattach = dataKey;
+			dataKey = undefined;
+		}
+		autoattach = typeof autoattach === 'undefined' ? true : autoattach;
 		dataKey = dataKey || 'dropdownBox';
 		return $(this).each(function() {
 			var $select = $(this);
 			var box;
-			$select.data(dataKey, box = ($select.data(dataKey) || new DropdownBox(this, options)));
+			$select.data(dataKey, box = ($select.data(dataKey) || new DropdownBox(this, options, autoattach)));
 		});
 	};
 

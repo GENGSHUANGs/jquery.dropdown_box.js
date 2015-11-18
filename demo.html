@@ -20,27 +20,56 @@
 	.dropdown .dropdown-items .dropdown-item a{text-decoration: none;display:block;width:100%;height:100%;}
 	</style>
         <div class="vcontrol-switcher" >
-        <select id="select" style="width:120px;height:36px;margin-left:20px;">
-                <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
-                <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
-                <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
-                <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
-                <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
-                <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
-        </select>
-
-        <select id="select2" style="width:120px;height:36px;margin-left:20px;">
-                <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
-                <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
-                <optgroup label="已完成" >
-                <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
-                <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
-                </optgroup>
-                <optgroup label="未完成" >
-                <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
-                <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
-                </optgroup>
-        </select>
+        <style>
+        table{background:#cccccc;}
+        table td{font-size:12px;color:#666666;padding:5px;background:#ffffff;}
+        table tr:first-child td{text-align:center;}
+        </style>
+        <table cellspacing="1">
+                <tr>
+                        <td >A(默认和所有的互斥)</td>
+                        <td>B(带分组)</td>
+                        <td>C(和B互斥)</td>
+                </tr>
+                <tr>
+                        <td>
+                                <select id="select" style="width:120px;height:36px;margin-left:20px;">
+                                        <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
+                                        <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
+                                        <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
+                                        <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
+                                        <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
+                                        <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
+                                </select>
+                        </td>
+                        <td>
+                                <select id="select2" style="width:120px;height:36px;margin-left:20px;">
+                                        <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
+                                        <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
+                                        <optgroup label="已完成" >
+                                        <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
+                                        <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
+                                        </optgroup>
+                                        <optgroup label="待处理" >
+                                        <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
+                                        <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
+                                        </optgroup>
+                                </select>
+                        </td>
+                        <td>
+                                <select id="select3" style="width:120px;height:36px;margin-left:20px;">
+                                        <optgroup label="待处理" >
+                                        <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
+                                        <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
+                                        </optgroup>
+                                        <optgroup label="已完成" >
+                                        <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
+                                        <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
+                                        </optgroup>
+                                </select>
+                        </td>
+                </tr>
+        </table>        
         </div>
 
         <br /><br /><br /><br /><br /><br />
@@ -78,7 +107,6 @@ console.log('current value is : ',$(this).val());
         <script src="jquery.dropdown_box.js"></script>
         <style>
         .vcontrol-switcher .dropdown{box-sizing:border-box;width:118px;height:36px;line-height:34px;border:1px solid #ffffff;border-radius:0px;transition:all 0.2s linear 0.1s;}
-        .vcontrol-switcher .dropdown{margin-left:20px;} /**/
         .vcontrol-switcher .dropdown:hover,.vcontrol-switcher .dropdown.actived{border-color:#999999;}
         .vcontrol-switcher .dropdown.actived{border-radius: 0px 0px 0px 0px;}
         .vcontrol-switcher .dropdown .dropdown-current{color:#111111;text-decoration: none;position:relatve;width:118px;height:36px;}
@@ -102,7 +130,7 @@ console.log('current value is : ',$(this).val());
                 build: function(option, iselected) {
                         return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '" title="'+(option.innerHTML || '')+'"><a href="javascript:;"><img class="avatar" src="'+option.getAttribute('data-imgpath')+'" /><span class="text" >' + (option.innerHTML || '') + '</span></a></li>';
                 },
-                expand:function(dropdown){
+                expand:function(dropdown){ // 代理默认处理逻辑
                         if($(dropdown).is('.actived'))
                                 return ;
                         $(dropdown).addClass('actived');
@@ -114,7 +142,7 @@ console.log('current value is : ',$(this).val());
                                 opacity:1
                         });
                 },
-                collapse:function(dropdown){
+                collapse:function(dropdown){ // 代理默认处理逻辑
                         if(!$(dropdown).is('.actived'))
                                 return ;
                         new TimelineMax().fromTo(dropdown.querySelector('.dropdown-items'),0.2,{
@@ -167,7 +195,50 @@ console.log('current value is : ',$(this).val());
                         }).add(function(){
                                 $(dropdown).removeClass('actived');
                         });
-                }
+                },
+                mutexWith:false
+        }).on('change',function(){
+                console.log('current value is : ',$(this).val());
+        });
+
+        /**
+        和B互斥 */
+        $('#select3').dropdownBox({
+                build_current: function(option) {
+                        return '<a class="dropdown-current" href="javascript:;" title="'+(option.innerHTML || '')+'"><span class="text">' + (option.innerHTML || '') + '</span><i class="icon fa fa-sort-desc" ></i></a>';
+                },
+                build: function(option, iselected) {
+                        if(option.tagName === 'OPTION')
+                        return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '" title="'+(option.innerHTML || '')+'"><a href="javascript:;"><img class="avatar" src="'+option.getAttribute('data-imgpath')+'" /><span class="text" >' + (option.innerHTML || '') + '</span></a></li>';
+                        else
+                        return '<li class="dropdown-group-item" >'+(option.getAttribute('label') || '')+'</li>';
+                },
+                expand:function(dropdown){
+                        if($(dropdown).is('.actived'))
+                                return ;
+                        $(dropdown).addClass('actived');
+                        new TimelineMax().fromTo($(dropdown).find('.dropdown-items'),0.2,{
+                                marginTop:'-10px',
+                                opacity:0
+                        },{
+                                marginTop:'0px',
+                                opacity:1
+                        });
+                },
+                collapse:function(dropdown){
+                        if(!$(dropdown).is('.actived'))
+                                return ;
+                        new TimelineMax().fromTo(dropdown.querySelector('.dropdown-items'),0.2,{
+                                marginTop:'0px',
+                                opacity:1
+                        },{
+                                marginTop:'-10px',
+                                opacity:0
+                        }).add(function(){
+                                $(dropdown).removeClass('actived');
+                        });
+                },
+                mutexWith:'#select2'
         }).on('change',function(){
                 console.log('current value is : ',$(this).val());
         });

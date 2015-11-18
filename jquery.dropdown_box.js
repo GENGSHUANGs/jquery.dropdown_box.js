@@ -3,7 +3,7 @@
 
 	var DropdownBox = function(dom, options) {
 		this.$dom = $(dom);
-		this.options = $.extend(DropdownBox.defaults, options);
+		this.options = $.extend({}, DropdownBox.defaults, options);
 		this.attach();
 		this.bind_events();
 		window.setTimeout(this.$dom.trigger.bind(this.$dom, 'change'), 0);
@@ -84,7 +84,18 @@
 				dropdown = dropdown || this.$dropdown[0];
 				if (typeof this.__delay_timer !== 'undefined')
 					window.clearTimeout(this.__delay_timer);
+
 				var self = this;
+				if (method === 'expand' && this.options.mutexWith !== false) {
+					$(this.options.mutexWith).each(function() {
+						console.log(this.id);
+						var box = $(this).data('dropdownBox');
+						if (typeof box === 'undefined' || box === null)
+							return;
+						box.collapse();
+					});
+				}
+
 				var next = function() {
 					self.options[method].call(self.options[method], dropdown, delay);
 					window.clearTimeout(self.__delay_timer);
@@ -110,10 +121,17 @@
 	};
 
 	/**
-	排序*/
+	排序
+	@param {function} fn : function(a,b){...} */
 	DropdownBox.prototype.sort = function(fn) {
 		var $options = this.$dom.find('> * ');
-		$options.sort(fn).appendTo(this.$dom);
+		$options.sort(function(a, b) {
+			if (a.tagName === 'OPTGROUP')
+				$(a).find('> * ').sort(fn).appendTo(a);
+			if (b.tagName === 'OPTGROUP')
+				$(b).find('> * ').sort(fn).appendTo(b);
+			return fn(a, b);
+		}).appendTo(this.$dom);
 		this.rebuild();
 	};
 
@@ -136,7 +154,8 @@
 		/**
 		构造待选择的下拉项目
 		@param {HTMLOptionElement} option : 需要构造的项目
-		@param {boolean} iselected : 项目是否是被选中的状态(通过option.selected也能得到)*/
+		@param {boolean} iselected : 项目是否是被选中的状态(通过option.selected也能得到)
+		@param {boolean} isgroup : 是否是分组元素 */
 		build: function(option, iselected, isgroup) {
 			if (!isgroup)
 				return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '"><a href="javascript:;">' + (option.innerHTML || '') + '</a></li>';
@@ -154,7 +173,12 @@
 		收起下拉 */
 		collapse: function(dropdown) {
 			$(dropdown).removeClass('actived');
-		}
+		},
+		/**
+		互斥模式(当前只能保留一个是展开状态)，只在使用默认dataKey的情况下有效 ; 如果false，则不处理互斥关系 ;
+		如果想要某个特定的dropdownBox互斥，只需要配置为相应的select控件的selector即可;
+		默认和所有的select控件互斥 */
+		mutexWith: 'select'
 	};
 
 	/**

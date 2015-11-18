@@ -95,7 +95,9 @@ console.log('current value is : ',$(this).val());
                 <textarea id="log" style="width:100%;height:300px;font-family:'Consolas';font-size:12px;box-sizing:border-box;"></textarea>
         </div>F
         <script>
+        var oldlog = console.log;
         console.log = function(){
+                oldlog.apply(console,arguments);
                 var textarea = document.getElementById('log');
                 var str = '';
                 [].slice.call(arguments).forEach(function(obj){

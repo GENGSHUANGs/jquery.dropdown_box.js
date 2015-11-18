@@ -19,7 +19,7 @@
 				self[$dropdown.is('.actived') ? 'collapse' : 'expand'].call(self, $dropdown[0]);
 			});
 		} else {
-			$dropdown.on('mouseenter', self.expand.bind(self, $dropdown[0])).on('mouseleave', self.collapse.bind(self, $dropdown[0]));
+			$dropdown.on('mouseenter', this.expand.bind(this, $dropdown[0])).on('mouseleave', this.collapse.bind(this, $dropdown[0]));
 		}
 		$dropdown.on('click', '.dropdown-items > .dropdown-item > a', function() {
 			self.switchTo($(this).closest('.dropdown-item').attr('data-value'));
@@ -76,11 +76,15 @@
 			展开，收起
 			@param {number} delay : 延迟(ms)*/
 			return function(dropdown) {
+				if (typeof this.$dropdown === 'undefined')
+					return;
+
 				var delay;
 				if (Object.prototype.toString.call(dropdown) === '[object Number]') {
 					delay = dropdown;
 					dropdown = undefined;
 				}
+
 				dropdown = dropdown || this.$dropdown[0];
 				if (typeof this.__delay_timer !== 'undefined')
 					window.clearTimeout(this.__delay_timer);

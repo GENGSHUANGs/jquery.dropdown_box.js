@@ -14,18 +14,32 @@
 	.dropdown .dropdown-items{list-style:none;margin:0px;padding:0px;display:none;position:absolute;top:100%;}
 	.dropdown.actived .dropdown-items{display:block;}
 	.dropdown .dropdown-items .dropdown-item {display:block;border-bottom:1px solid #eeeeee;}
+        .dropdown .dropdown-items .dropdown-group-item{display:block;}
 	.dropdown .dropdown-items .dropdown-item:last-child{border-bottom:0px;}
 	.dropdown .dropdown-items .dropdown-item.actived{}
 	.dropdown .dropdown-items .dropdown-item a{text-decoration: none;display:block;width:100%;height:100%;}
 	</style>
         <div class="vcontrol-switcher" >
-        <select id="select" style="width:120px;height:36px;">
+        <select id="select" style="width:120px;height:36px;margin-left:20px;">
                 <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
                 <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
                 <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
                 <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
                 <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
                 <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
+        </select>
+
+        <select id="select2" style="width:120px;height:36px;margin-left:20px;">
+                <option id="opt1" value="1" data-imgpath="./avatar.jpg">小花花小花花小花花花小花花</option>
+                <option value="2" data-imgpath="./avatar2.jpg">大花花2</option>
+                <optgroup label="已完成" >
+                <option value="3" data-imgpath="./avatar2.jpg">大花花3</option>
+                <option value="4" data-imgpath="./avatar2.jpg">大花花4</option>
+                </optgroup>
+                <optgroup label="未完成" >
+                <option value="5" data-imgpath="./avatar2.jpg">大花花5</option>
+                <option value="6" data-imgpath="./avatar2.jpg">大花花6</option>
+                </optgroup>
         </select>
         </div>
 
@@ -64,12 +78,13 @@ console.log('current value is : ',$(this).val());
         <script src="jquery.dropdown_box.js"></script>
         <style>
         .vcontrol-switcher .dropdown{box-sizing:border-box;width:118px;height:36px;line-height:34px;border:1px solid #ffffff;border-radius:0px;transition:all 0.2s linear 0.1s;}
+        .vcontrol-switcher .dropdown{margin-left:20px;} /**/
         .vcontrol-switcher .dropdown:hover,.vcontrol-switcher .dropdown.actived{border-color:#999999;}
         .vcontrol-switcher .dropdown.actived{border-radius: 0px 0px 0px 0px;}
         .vcontrol-switcher .dropdown .dropdown-current{color:#111111;text-decoration: none;position:relatve;width:118px;height:36px;}
         .vcontrol-switcher .dropdown .dropdown-current .text{width: 90px;height: 34px;line-height:34px;display: block;text-align: center;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;box-sizing:border-box;padding-left:5px;padding-right:5px;}
         .vcontrol-switcher .dropdown .dropdown-current .icon{position: absolute;top: 5px;right: 8px;width: 16px;height: 16px;color: #999999;font-size: 18px;}
-        .vcontrol-switcher .dropdown .dropdown-items{width:118px;border:1px solid #999999;box-sizing:border-box;margin-left:-1px;border-radius:0px 0px 0px 0px;background:#F8F8F8;border-top:1px solid #cccccc;}
+        .vcontrol-switcher .dropdown .dropdown-items{width:118px;border:1px solid #999999;box-sizing:border-box;margin-left:-1px;border-radius:0px 0px 0px 0px;background:#F8F8F8;border-top:1px solid #cccccc;z-index:1;}
         .vcontrol-switcher .dropdown.actived .dropdown-items{}
         .vcontrol-switcher .dropdown .dropdown-items .dropdown-item{}
         .vcontrol-switcher .dropdown .dropdown-items .dropdown-item:last-child{border-radius:0px 0px 0px 0px;}
@@ -77,6 +92,7 @@ console.log('current value is : ',$(this).val());
         .vcontrol-switcher .dropdown .dropdown-items .dropdown-item a{font-size:12px;color:#111111;width:118px; height:36px;line-height:34px;box-sizing:border-box;padding-left:5px;padding-right:5px;}
         .vcontrol-switcher .dropdown .dropdown-items .dropdown-item a .avatar{width:26px;height:26px;margin:0px;padding:0px;border-radius:50%;position: relative;top: -5px;}
         .vcontrol-switcher .dropdown .dropdown-items .dropdown-item a .text{height: 36px;line-height: 34px;display: inline-block;position: relative;padding-left: 5px;text-align: left;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:12px;width:77px;color:#111111;}
+        .vcontrol-switcher .dropdown .dropdown-items .dropdown-group-item{font-size:12px;color:#666666;height:26px;line-height:26px;box-sizing:border-box;padding-left:5px;}
         </style>
         <script>
         $('#select').dropdownBox({
@@ -113,6 +129,47 @@ console.log('current value is : ',$(this).val());
                 }
         }).on('change',function(){
         	console.log('current value is : ',$(this).val());
+        });
+
+        /**
+        带分组 */
+        $('#select2').dropdownBox({
+                build_current: function(option) {
+                        return '<a class="dropdown-current" href="javascript:;" title="'+(option.innerHTML || '')+'"><span class="text">' + (option.innerHTML || '') + '</span><i class="icon fa fa-sort-desc" ></i></a>';
+                },
+                build: function(option, iselected) {
+                        if(option.tagName === 'OPTION')
+                        return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '" title="'+(option.innerHTML || '')+'"><a href="javascript:;"><img class="avatar" src="'+option.getAttribute('data-imgpath')+'" /><span class="text" >' + (option.innerHTML || '') + '</span></a></li>';
+                        else
+                        return '<li class="dropdown-group-item" >'+(option.getAttribute('label') || '')+'</li>';
+                },
+                expand:function(dropdown){
+                        if($(dropdown).is('.actived'))
+                                return ;
+                        $(dropdown).addClass('actived');
+                        new TimelineMax().fromTo($(dropdown).find('.dropdown-items'),0.2,{
+                                marginTop:'-10px',
+                                opacity:0
+                        },{
+                                marginTop:'0px',
+                                opacity:1
+                        });
+                },
+                collapse:function(dropdown){
+                        if(!$(dropdown).is('.actived'))
+                                return ;
+                        new TimelineMax().fromTo(dropdown.querySelector('.dropdown-items'),0.2,{
+                                marginTop:'0px',
+                                opacity:1
+                        },{
+                                marginTop:'-10px',
+                                opacity:0
+                        }).add(function(){
+                                $(dropdown).removeClass('actived');
+                        });
+                }
+        }).on('change',function(){
+                console.log('current value is : ',$(this).val());
         });
 
 

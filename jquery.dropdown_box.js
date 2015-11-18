@@ -39,10 +39,17 @@
 		this.$dropdown.find('.dropdown-items').empty();
 		this.$dropdown.find('.dropdown-current').empty();
 		var self = this;
-		this.$dom.find('option').each(function() {
+		this.$dom.find('> * ').each(function() {
 			var option = this;
-			var html = self.options.build(option, option.selected);
+			var isgroup = option.tagName === 'OPTGROUP';
+			var html = self.options.build(option, option.selected, isgroup);
 			self.$dropdown.find('.dropdown-items').append(html);
+			if (isgroup) {
+				$(option).find('> * ').each(function() {
+					var html = self.options.build(this, this.selected, false);
+					self.$dropdown.find('.dropdown-items').append(html);
+				});
+			}
 		});
 		var $option = this.$dom.find('option:selected');
 		if ($option.length <= 0)
@@ -65,6 +72,9 @@
 
 	['expand', 'collapse'].forEach(function(method) {
 		DropdownBox.prototype[method] = function(method) {
+			/**
+			展开，收起
+			@param {number} delay : 延迟(ms)*/
 			return function(dropdown) {
 				var delay;
 				if (Object.prototype.toString.call(dropdown) === '[object Number]') {
@@ -88,12 +98,9 @@
 		}(method);
 	});
 
-	DropdownBox.prototype.hide = function() {
-		this.options.hide();
-	};
-
 	/**
-	删除 */
+	删除 
+	@param {string} val : 选项值或者selector */
 	DropdownBox.prototype.remove = function(val) {
 		var $option = this.$dom.find('option[value="' + (val || '') + '"]');
 		if ($option.length === 0)
@@ -105,36 +112,44 @@
 	/**
 	排序*/
 	DropdownBox.prototype.sort = function(fn) {
-		var $options = this.$dom.find('option');
+		var $options = this.$dom.find('> * ');
 		$options.sort(fn).appendTo(this.$dom);
 		this.rebuild();
 	};
 
 	DropdownBox.defaults = {
 		/**
-		是否使用hover 控制展开与收起 */
+		是否使用hover 控制展开与收起(与点击互斥) */
 		hover: false,
+
 		/**
 		外部mask ，这是最基本的结构，只能丰富，不能修改 */
 		template: '<div class="dropdown"><a class="dropdown-current"></a><ul class="dropdown-items"></ul></div>',
+
 		/**
 		构造当前选择的项目
 		@param {HTMLOptionElement} option : 当前select选的项目 */
 		build_current: function(option) {
 			return '<a class="dropdown-current" href="javascript:;">' + (option.innerHTML || '') + '</a>';
 		},
+
 		/**
 		构造待选择的下拉项目
 		@param {HTMLOptionElement} option : 需要构造的项目
 		@param {boolean} iselected : 项目是否是被选中的状态(通过option.selected也能得到)*/
-		build: function(option, iselected) {
-			return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '"><a href="javascript:;">' + (option.innerHTML || '') + '</a></li>';
+		build: function(option, iselected, isgroup) {
+			if (!isgroup)
+				return '<li class="dropdown-item' + (iselected ? ' actived' : '') + '" data-value="' + (option.value || '') + '"><a href="javascript:;">' + (option.innerHTML || '') + '</a></li>';
+			else
+				return '<li class="dropdown-group-item" >' + (option.getAttribute('label') || '') + '</li>';
 		},
+
 		/**
 		展开下拉 */
 		expand: function(dropdown) {
 			$(dropdown).addClass('actived');
 		},
+
 		/**
 		收起下拉 */
 		collapse: function(dropdown) {
@@ -142,6 +157,17 @@
 		}
 	};
 
+	/**
+	jQuery 插件接口
+	@param {map} options : 选项 ，参看 DropdownBox.defaults
+	@param {string} dataKey : 对象存储名称（通过$('select').data(dataKey)获取），默认: dropdownBox
+	Usage :
+	```javascript
+	// 构建控件
+	$('select').dropdownBox({...}); 
+	// 获取操控对象
+	$('select').data('dropdownBox').xxx();
+	```*/
 	$.fn.dropdownBox = function(options, dataKey) {
 		dataKey = dataKey || 'dropdownBox';
 		return $(this).each(function() {

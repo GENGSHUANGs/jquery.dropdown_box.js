@@ -18,9 +18,14 @@
 		this.$dom.attr('__dropdown-old-display', this.$dom.css('display') || '').css('display', 'none');
 		this.$dom.after($dropdown);
 		var self = this;
-		$dropdown.on('click', '.dropdown-current', function() {
-			self[$dropdown.is('.actived') ? 'collapse' : 'expand'].call(self, $dropdown[0]);
-		}).on('click', '.dropdown-items > .dropdown-item > a', function() {
+		if (!this.options.hover) {
+			$dropdown.on('click', '.dropdown-current', function() {
+				self[$dropdown.is('.actived') ? 'collapse' : 'expand'].call(self, $dropdown[0]);
+			});
+		} else {
+			$dropdown.on('mouseenter', self.expand.bind(self, $dropdown[0])).on('mouseleave', self.collapse.bind(self, $dropdown[0]));
+		}
+		$dropdown.on('click', '.dropdown-items > .dropdown-item > a', function() {
 			self.switchTo($(this).closest('.dropdown-item').attr('data-value'));
 		});
 	};
@@ -90,6 +95,9 @@
 	};
 
 	DropdownBox.defaults = {
+		/**
+		是否使用hover 控制展开与收起 */
+		hover: false,
 		/**
 		外部mask ，这是最基本的结构，只能丰富，不能修改 */
 		template: '<div class="dropdown"><a class="dropdown-current"></a><ul class="dropdown-items"></ul></div>',
